@@ -55,14 +55,20 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.cyan,
+        title: Text("Photo Selection"),
+      ),
       body: Column(
         children: [
+          Divider(color: Colors.white,height: 10,),
           Container(
             height: MediaQuery.of(context).size.height /2,
             width: double.infinity,
             color: Colors.blue,
             child: selectedImage == null ? Center(child: Text("No Image Selected", style: TextStyle(fontSize: 15,color: Colors.redAccent))) : Image.file(selectedImage),
           ),
+          Divider(color: Colors.white,height: 50,),
           Divider(color: Colors.white,height: 50,),
 
           Row(
