@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
 
-class ControllerTwoClass extends StatelessWidget {
-
+class ControllerFourClass extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        color: Colors.cyan,
+        color: Colors.redAccent,
       ),
     );
   }

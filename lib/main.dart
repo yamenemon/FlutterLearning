@@ -3,6 +3,7 @@ import 'package:liquid_swipe/liquid_swipe.dart';
 import 'package:practice_flutter/ControllerOne.dart';
 import 'package:practice_flutter/ControllerThree.dart';
 import 'package:practice_flutter/ControllerTwo.dart';
+import 'package:practice_flutter/ControllerFour.dart';
 import 'package:practice_flutter/data.dart';
 import 'package:practice_flutter/tabClassOne.dart';
 import 'package:practice_flutter/tabClassTwo.dart';
@@ -11,21 +12,178 @@ import 'package:practice_flutter/Receive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 void main() {
-  runApp(ChangeNotifierProvider(
-    create: (context) => Data(),
-    child: MyMainApp()
-  )
-  );
+  runApp(
+      MaterialApp(debugShowCheckedModeBanner: false, home: CollectionCell()));
+}
+
+class CollectionCell extends StatefulWidget {
+  @override
+  _CollectionCellState createState() => _CollectionCellState();
+}
+
+class _CollectionCellState extends State<CollectionCell> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Container(
+          height: MediaQuery.of(context).size.height / 2.5,
+          color: Colors.redAccent,
+          margin: EdgeInsets.all(20),
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: 10,
+                itemBuilder: (context,index){
+                  return  Center(
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      overflow: Overflow.visible,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xff7c94b6),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          height: constraints.maxHeight / 2,
+                          width: MediaQuery.of(context).size.width / 2,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 50,
+                                ),
+                                Text("Alert Dialog"),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Text("Alert Dialog"),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                            top: -50,
+                            child: CircleAvatar(
+                              radius: 50,
+                              child: Icon(Icons.ac_unit),
+                            ))
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CurvedTabBarControllerExample extends StatefulWidget {
+  @override
+  _CurvedTabBarControllerExampleState createState() =>
+      _CurvedTabBarControllerExampleState();
+}
+
+class _CurvedTabBarControllerExampleState
+    extends State<CurvedTabBarControllerExample> {
+  var _page = 0;
+  final pages = [
+    ControllerOneClass(),
+    ControllerTwoClass(),
+    ControllerOneClass(),
+    ControllerFourClass(),
+    ControllerFourClass(),
+  ];
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      bottomNavigationBar: CurvedNavigationBar(
+        index: 0,
+        color: Colors.white,
+        backgroundColor: Colors.grey,
+        buttonBackgroundColor: Colors.white,
+        animationCurve: Curves.easeInOut,
+        animationDuration: Duration(milliseconds: 200),
+        onTap: (index) {
+          setState(() {
+            _page = index;
+          });
+        },
+        items: [
+          Icon(Icons.access_alarm),
+          Icon(Icons.favorite),
+          Icon(Icons.message),
+          Icon(Icons.photo_library),
+          Icon(Icons.favorite),
+        ],
+      ),
+      body: pages[_page],
+    );
+  }
 }
 
 class MyMainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: ImagePickerExample());
+        debugShowCheckedModeBanner: false, home: BottomSheetExample());
+  }
+}
+
+class BottomSheetExample extends StatelessWidget {
+  dismissBottomSheet(BuildContext context) {
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+          child: RaisedButton(
+        onPressed: () {
+          showModalBottomSheet(
+              context: context,
+              builder: (context) {
+                return Container(
+                  height: 250,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        title: Text("One"),
+                        subtitle: Text("Subtitle one"),
+                        trailing: Icon(Icons.add_a_photo),
+                      ),
+                      ListTile(
+                        title: Text("One"),
+                        subtitle: Text("Subtitle one"),
+                        trailing: Icon(Icons.add_a_photo),
+                      ),
+                      ListTile(
+                        title: Text("One"),
+                        subtitle: Text("Subtitle one"),
+                        trailing: Icon(Icons.add_a_photo),
+//                    onTap: dismissBottomSheet(context),
+                      ),
+                    ],
+                  ),
+                );
+              });
+        },
+        child: Text("Click Me"),
+      )),
+    );
   }
 }
 
@@ -35,14 +193,13 @@ class ImagePickerExample extends StatefulWidget {
 }
 
 class _ImagePickerExampleState extends State<ImagePickerExample> {
-
   File selectedImage;
 
   final picker = ImagePicker();
 
   Future getImageUsingPicker(int buttonTag) async {
     var imageType = ImageSource.camera;
-    if (buttonTag == 2){
+    if (buttonTag == 2) {
       imageType = ImageSource.gallery;
     }
     final pickedFile = await picker.getImage(source: imageType);
@@ -61,27 +218,47 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
       ),
       body: Column(
         children: [
-          Divider(color: Colors.white,height: 10,),
+          Divider(
+            color: Colors.white,
+            height: 10,
+          ),
           Container(
-            height: MediaQuery.of(context).size.height /2,
+            height: MediaQuery.of(context).size.height / 2,
             width: double.infinity,
             color: Colors.blue,
-            child: selectedImage == null ? Center(child: Text("No Image Selected", style: TextStyle(fontSize: 15,color: Colors.redAccent))) : Image.file(selectedImage),
+            child: selectedImage == null
+                ? Center(
+                    child: Text("No Image Selected",
+                        style:
+                            TextStyle(fontSize: 15, color: Colors.redAccent)))
+                : Image.file(selectedImage),
           ),
-          Divider(color: Colors.white,height: 50,),
-          Divider(color: Colors.white,height: 50,),
-
+          Divider(
+            color: Colors.white,
+            height: 50,
+          ),
+          Divider(
+            color: Colors.white,
+            height: 50,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FloatingActionButton(onPressed: (){
-                getImageUsingPicker(1);
-              },child: Icon(Icons.camera),),
-              SizedBox(width: 20,),
-              FloatingActionButton(onPressed: (){
-                getImageUsingPicker(2);
-              },child: Icon(Icons.photo_library),)
-
+              FloatingActionButton(
+                onPressed: () {
+                  getImageUsingPicker(1);
+                },
+                child: Icon(Icons.camera),
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              FloatingActionButton(
+                onPressed: () {
+                  getImageUsingPicker(2);
+                },
+                child: Icon(Icons.photo_library),
+              )
             ],
           ),
         ],
@@ -90,41 +267,37 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
   }
 }
 
-
-
-
-
-
-
-
-
-
 class StateManagementProvider extends StatefulWidget {
   @override
-  _StateManagementProviderState createState() => _StateManagementProviderState();
+  _StateManagementProviderState createState() =>
+      _StateManagementProviderState();
 }
 
 class _StateManagementProviderState extends State<StateManagementProvider> {
-
   @override
   Widget build(BuildContext context) {
-    final providerData =  Provider.of<Data>(context);
+    final providerData = Provider.of<Data>(context);
 //    final provideData = Provider.of(context);
     int rootClassValue = 100;
-    return SafeArea(child: Scaffold(
+    return SafeArea(
+        child: Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(providerData.value.toString(),style: TextStyle(fontSize: 50),),
+            Text(
+              providerData.value.toString(),
+              style: TextStyle(fontSize: 50),
+            ),
             RaisedButton(
-              onPressed: (){
+              onPressed: () {
                 providerData.increment();
               },
             ),
             RaisedButton(
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Receive()));
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Receive()));
               },
             )
           ],
@@ -154,41 +327,39 @@ class _TopTabbarControllerState extends State<TopTabbarController> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-          bottomNavigationBar: BottomNavigationBar(
-            showUnselectedLabels: true,
-            currentIndex: tabIndex,
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.add),
-                backgroundColor: Colors.redAccent,
-                label: "Add",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.ac_unit),
-                label: "Call",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.add_a_photo),
-                label: "Fuck",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.build),
-                label: "Suck",
-              ),
-            ],
-            onTap: (index) {
-              setState(() {
-                tabIndex = index;
-              });
-            },
-          ),
-          body: pages[tabIndex],
+        bottomNavigationBar: BottomNavigationBar(
+          showUnselectedLabels: true,
+          currentIndex: tabIndex,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.add),
+              backgroundColor: Colors.redAccent,
+              label: "Add",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.ac_unit),
+              label: "Call",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.add_a_photo),
+              label: "Fuck",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.build),
+              label: "Suck",
+            ),
+          ],
+          onTap: (index) {
+            setState(() {
+              tabIndex = index;
+            });
+          },
         ),
+        body: pages[tabIndex],
+      ),
     );
   }
 }
-
-
 
 class TabbarExample extends StatelessWidget {
   @override
@@ -219,23 +390,23 @@ class _BottomHomePageState extends State<BottomHomePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text("Tab bar Example"),
-            centerTitle: true,
-            leading: Icon(Icons.add),
-            elevation: 10,
-            actions: [
-              IconButton(
-                icon: Icon(Icons.add_a_photo),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: Icon(Icons.ac_unit),
-                onPressed: () {},
-              )
-            ],
-          ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Tab bar Example"),
+          centerTitle: true,
+          leading: Icon(Icons.add),
+          elevation: 10,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.add_a_photo),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: Icon(Icons.ac_unit),
+              onPressed: () {},
+            )
+          ],
+        ),
         backgroundColor: Colors.purple,
         bottomNavigationBar: BottomNavigationBar(
           showUnselectedLabels: true,
